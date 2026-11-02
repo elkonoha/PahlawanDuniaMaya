@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1e1b4b">
+    <meta name="author" content="ELPADRI">
+    <meta name="copyright" content="© 2026 ELPADRI. All Rights Reserved.">
+    <meta name="description" content="Hero Dash: Cyber Obby - Game Petualangan Anak Modern karya ELPADRI">
+    
+    <title>HERO DASH: CYBER OBBY - By ELPADRI</title>
+    
+    <!-- PWA Manifest & Icons (Upload manual di GitHub) -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    
+    <!-- Google Fonts untuk tampilan ramah anak -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="game-container">
+        <!-- KANVAS GAME UTAMA -->
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- HUD (Tampilan Saat Bermain) -->
+        <div id="hud" class="hidden">
+            <div class="hud-top">
+                <div class="hud-stats">
+                    <div class="stat-pill coin-pill">🪙 <span id="hud-coins">0</span></div>
+                    <div class="stat-pill level-pill">🏆 LVL <span id="hud-level">1</span></div>
+                    <div class="stat-pill heart-pill" id="hud-hearts">❤️❤️❤️</div>
+                </div>
+                <button id="btn-pause" class="icon-btn">⏸️</button>
+            </div>
+
+            <!-- Progress Bar Level / Boss HP -->
+            <div class="progress-wrapper">
+                <div id="progress-label">Menuju Boss...</div>
+                <div class="progress-bar-bg">
+                    <div id="progress-fill"></div>
+                </div>
+            </div>
+
+            <!-- Indikator Power-up Aktif -->
+            <div id="powerup-indicators"></div>
+
+            <!-- Kontrol Layar Sentuh (HP/Tablet) -->
+            <div class="touch-controls">
+                <button id="btn-jump" class="control-btn jump-btn">
+                    <span>⬆️</span>
+                    <small>LOMPAT (2x)</small>
+                </button>
+                <button id="btn-dash" class="control-btn dash-btn">
+                    <span>⚡</span>
+                    <small>SERANG / DASH</small>
+                </button>
+            </div>
+        </div>
+
+        <!-- MENU UTAMA -->
+        <div id="main-menu" class="overlay-screen">
+            <div class="top-bar">
+                <div class="stat-pill coin-pill">🪙 <span id="menu-coins">0</span></div>
+                <div class="stat-pill level-pill">🌍 Level <span id="menu-level">1</span></div>
+                <button id="btn-sound" class="icon-btn">🔊</button>
+            </div>
+
+            <div class="title-box">
+                <span class="badge-new">✨ GAME ANAK TERBARU ✨</span>
+                <h1 class="game-title">HERO DASH<br><span>CYBER OBBY</span></h1>
+                <p class="creator-tag">Karya Eksklusif: <strong>ELPADRI</strong></p>
+            </div>
+
+            <!-- Preview Karakter Aktif -->
+            <div class="hero-preview-card">
+                <div id="preview-avatar" class="preview-avatar">🤖</div>
+                <div class="preview-info">
+                    <h3 id="preview-name">Budi Cyber</h3>
+                    <p id="preview-pet">Pet: Belum Ada</p>
+                </div>
+            </div>
+
+            <div class="menu-buttons">
+                <button id="btn-play" class="btn-primary pulse-anim">▶️ MULAI MAIN (LEVEL <span id="btn-lvl-num">1</span>)</button>
+                
+                <div class="menu-grid">
+                    <button id="btn-shop" class="btn-secondary">🦸 KARAKTER & PET</button>
+                    <button id="btn-gacha" class="btn-gacha">🎁 KOTAK KEJUTAN</button>
+                    <button id="btn-missions" class="btn-mission">🎯 TANTANGAN <span id="mission-badge" class="notif-dot hidden">!</span></button>
+                    <button id="btn-about" class="btn-info">👑 HAK CIPTA</button>
+                </div>
+            </div>
+
+            <footer class="copyright-footer">
+                © 2026 <strong>ELPADRI</strong>. Hak Cipta Dilindungi Undang-Undang.
+            </footer>
+        </div>
+
+        <!-- MODAL TOKO KARAKTER & PET -->
+        <div id="shop-modal" class="overlay-screen hidden">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <h2>🛒 TOKO PAHLAWAN</h2>
+                    <div class="stat-pill coin-pill">🪙 <span id="shop-coins">0</span></div>
+                    <button class="btn-close" data-close="shop-modal">✖️</button>
+                </div>
+                <div class="tab-bar">
+                    <button id="tab-chars" class="tab-btn active">🦸 Karakter Modern</button>
+                    <button id="tab-pets" class="tab-btn">🐉 Pet Pendamping</button>
+                </div>
+                <div id="shop-items" class="shop-grid"></div>
+            </div>
+        </div>
+
+        <!-- MODAL KOTAK KEJUTAN (GACHA) -->
+        <div id="gacha-modal" class="overlay-screen hidden">
+            <div class="modal-card text-center">
+                <div class="modal-header">
+                    <h2>🎁 KOTAK MISTERI</h2>
+                    <div class="stat-pill coin-pill">🪙 <span id="gacha-coins">0</span></div>
+                    <button class="btn-close" data-close="gacha-modal">✖️</button>
+                </div>
+                <div class="gacha-content">
+                    <div id="gacha-box-icon" class="gacha-box">📦</div>
+                    <p id="gacha-result-text">Buka Kotak Kejutan untuk hadiah Koin Jackpot atau Karakter Langka!</p>
+                    <button id="btn-spin-gacha" class="btn-primary">🔑 BUKA KOTAK (50 🪙)</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL MISI & TANTANGAN -->
+        <div id="missions-modal" class="overlay-screen hidden">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <h2>🎯 TANTANGAN SERU</h2>
+                    <button class="btn-close" data-close="missions-modal">✖️</button>
+                </div>
+                <div id="missions-list" class="missions-list"></div>
+            </div>
+        </div>
+
+        <!-- MODAL HAK CIPTA ELPADRI -->
+        <div id="about-modal" class="overlay-screen hidden">
+            <div class="modal-card text-center">
+                <div class="modal-header">
+                    <h2>👑 INFORMASI & HAK CIPTA</h2>
+                    <button class="btn-close" data-close="about-modal">✖️</button>
+                </div>
+                <div class="about-content">
+                    <div class="crown-icon">👑</div>
+                    <h3>HERO DASH: CYBER OBBY</h3>
+                    <p>Versi 2.0 (Edisi Spesial Modern)</p>
+                    <hr>
+                    <p>Game ini dirancang, dikembangkan, dan dimiliki sepenuhnya oleh:</p>
+                    <h2 class="elpadri-signature">✨ ELPADRI ✨</h2>
+                    <p class="copyright-notice">
+                        © 2026 <strong>ELPADRI</strong>.<br>
+                        Seluruh Hak Cipta Dilindungi.<br>
+                        Dilarang memperjualbelikan ulang tanpa izin resmi dari <strong>ELPADRI</strong>.
+                    </p>
+                    <hr>
+                    <p class="controls-guide">
+                        <strong>Cara Bermain:</strong><br>
+                        📱 HP/Tablet: Gunakan tombol <b>LOMPAT</b> & <b>SERANG</b> di layar.<br>
+                        💻 PC/Laptop: Tekan <b>SPASI / PANAH ATAS</b> untuk Lompat, dan <b>HURUF Z / X / PANAH KANAN</b> untuk Serang/Dash.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL PAUSE -->
+        <div id="pause-modal" class="overlay-screen hidden">
+            <div class="modal-card text-center">
+                <h2>⏸️ GAME DIJEDA</h2>
+                <p>Istirahat sejenak, Pahlawan!</p>
+                <div class="menu-buttons">
+                    <button id="btn-resume" class="btn-primary">▶️ LANJUTKAN</button>
+                    <button id="btn-quit" class="btn-secondary">🏠 KE MENU UTAMA</button>
+                </div>
+                <p class="small-copy">© ELPADRI</p>
+            </div>
+        </div>
+
+        <!-- MODAL GAME OVER / MENANG LEVEL -->
+        <div id="result-modal" class="overlay-screen hidden">
+            <div class="modal-card text-center">
+                <div id="result-icon" class="result-icon">🏆</div>
+                <h2 id="result-title">LEVEL SELESAI!</h2>
+                <p id="result-desc">Luar biasa! Kamu berhasil mengalahkan Boss!</p>
+                <div class="reward-box">
+                    <p>Koin Dikumpulkan: <strong>+<span id="result-coins">0</span> 🪙</strong></p>
+                </div>
+                <div class="menu-buttons">
+                    <button id="btn-next" class="btn-primary">🚀 LANJUT MAIN</button>
+                    <button id="btn-result-menu" class="btn-secondary">🏠 MENU UTAMA</button>
+                </div>
+                <p class="small-copy">Game Karya ELPADRI</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Utama & Registrasi Service Worker PWA -->
+    <script src="game.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('SW terdaftar:', reg.scope))
+                    .catch(err => console.log('SW gagal:', err));
+            });
+        }
+    </script>
+</body>
+</html>
