@@ -1,1 +1,24 @@
-
+{
+  "name": "HERO DASH: CYBER OBBY - By ELPADRI",
+  "short_name": "Hero Dash ELPADRI",
+  "description": "Game Petualangan Obby Modern karya ELPADRI dengan banyak karakter, pet, dan level.",
+  "start_url": "./index.html",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#0f172a",
+  "theme_color": "#1e1b4b",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
